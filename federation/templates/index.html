@@ -1,0 +1,28 @@
+<html>
+<head>
+   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!--[if lte IE 8]>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-old-ie-min.css">
+   <![endif]-->
+   <!--[if gt IE 8]><!-->
+   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+   <!--<![endif]-->
+
+</head>
+<body>
+   <form action="/create-federation" method="get">
+      <button name="createFed" type="submit">Create Federation</button>
+   </form>
+   <form action="/" method="get">
+      <button name="printFed" type="submit">Get Federation Info</button>
+   </form>
+   <form action="/" method="post">
+      Federation Id: <input type="number" name="fed_id"><br>
+      Number of devices: <input type="number" name="n_devices"><br>
+      <button name="trainFed" type="submit" formmethod="POST">Start & Connect Devices</button>
+   </form>
+   {{message}}
+</body>
+
+</html>

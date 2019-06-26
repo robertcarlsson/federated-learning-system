@@ -1,13 +1,10 @@
 FROM tensorflow/tensorflow:latest-py3
 
-COPY . /app
-
 RUN pip install --upgrade pip
 RUN pip install \
-    Flask
+    requests
 
-ENV FLASK_APP /app/app.py
+COPY . /app
 
-EXPOSE 5000
 ENTRYPOINT [ "python" ]
 CMD [ "/app/app.py" ]

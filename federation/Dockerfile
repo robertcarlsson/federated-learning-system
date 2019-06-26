@@ -1,6 +1,8 @@
 FROM tensorflow/tensorflow:latest-py3
 
-COPY . /app
+WORKDIR /app
+
+COPY . .
 
 RUN pip install --upgrade pip
 RUN pip install \
