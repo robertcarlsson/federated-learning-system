@@ -1,22 +1,12 @@
 version: '3'
 services:
   fed-srv:
-    build: ./federation
-    container_name: fed-srv
+    build: ./server
+    container_name: master
     ports:
-      - "5001:5001"
+      - "5000:5000"
     volumes:
-      - ./federation:/app
+      - ./server:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       FLASK_ENV: development
-  device:
-    build: ./device
-    restart: always
-    deploy:
-      replicas: 3
-    depends_on:
-      - fed-srv
-    volumes:
-      - ./device:/app
-    #command: ["./wait-for-it.sh", "db:5432", "--", "python", "/app/app.py"]
-    
