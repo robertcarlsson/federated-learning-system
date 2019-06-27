@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
     python3.5 \
     python3-pip
@@ -21,7 +23,7 @@ RUN pip install \
 
 #RUN pip install Flask
 
-#COPY . /app
+#COPY . /appw
 
 #ADD ./federation /app/federation
 #ADD ./device /app/device
