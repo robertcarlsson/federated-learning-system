@@ -1,6 +1,6 @@
 version: '3'
 services:
-  fed-srv:
+  master:
     build: ./server
     container_name: master
     ports:
@@ -10,3 +10,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       FLASK_ENV: development
+    tty: true
