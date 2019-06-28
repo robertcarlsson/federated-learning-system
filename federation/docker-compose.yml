@@ -6,17 +6,8 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./federation:/app
+      - .:/mnt/app
     environment:
       FLASK_ENV: development
-  device:
-    build: ../device
-    restart: always
-    deploy:
-      replicas: 3
-    depends_on:
-      - fed-srv
-    volumes:
-      - ./device:/app
-    #command: ["./wait-for-it.sh", "db:5432", "--", "python", "/app/app.py"]
-    
+    tty: true
+  

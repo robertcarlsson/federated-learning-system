@@ -2,7 +2,8 @@ version: '3'
 services:
   py-dock:
     build: .
-    container_name: docker-test
+    container_name: dtest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    stdin_open: true
     tty: true

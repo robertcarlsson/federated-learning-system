@@ -2,7 +2,7 @@ FROM tensorflow/tensorflow:latest-py3
 
 WORKDIR /app
 
-COPY . .
+COPY . /app
 
 RUN pip install --upgrade pip
 RUN pip install \
@@ -11,5 +11,7 @@ RUN pip install \
 ENV FLASK_APP /app/app.py
 
 EXPOSE 5000
+
+#ENTRYPOINT [ "sh" ]
 ENTRYPOINT [ "python" ]
 CMD [ "/app/app.py" ]
