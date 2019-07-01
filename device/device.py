@@ -1,20 +1,28 @@
-
+import json
 import requests
+
 from time import sleep
 
 # TensorFlow and tf.keras
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.models import model_from_json
 
-from tensorflow.keras.models import Sequential, model_from_json
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
+# Helper libraries
+import numpy as np
 
 class Device:
     def __init__(self, name):
         self.name = name
+        self.srv_url = 'http://192.168.42.141:5001'
+        self.srv_url = 'http://127.0.0.1:5001'
+        self.srv_url = 'http://192.168.1.7:5001'
         
+
+        self.connected = False
+        self.initiated = False
+        self.data_transfered = False
+
     def get_model_config(self):
         return self.model.to_json()
     
@@ -39,7 +47,45 @@ class Device:
 
     def run(self):
         while True:
-            sleep(2)
-            r = requests.get('http://192.168.42.141:5001')
-            print("Status: ", r.status_code, "\nHeaders: ", r.headers['content-type'])
+
+            if not self.connected:
+                try:
+                    print()
+                    response = requests.get(self.srv_url + '/')
+
+                    print("Status: ", response.status_code, "Headers: ", response.headers['content-type'])
+                    if response.status_code == 200:
+                        self.connected = True
+
+                except Exception as error:
+                    print(error)    
+            
+            elif self.connected and not self.initiated:
+                try:
+                    response = requests.get(self.srv_url + '/config')
+
+                    if response.status_code == 200:
+                        config = json.dumps(response.json())
+                        self.set_model_config(config)
+                        self.initiated = True
+
+                except Exception as error:
+                    print(error)
+
+            elif self.initiated and not self.data_transfered:
+                try:
+                    response = requests.get(self.srv_url + '/data')
+                    
+                    if response.status_code == 200:
+                        json_data = response.json()
+                        self.X_train = np.array(json_data['X_train'])
+                        self.y_train = np.array(json_data['y_train'])
+                        #print(type(json_data), len(json_data['X_train'][0][0]))
+
+                    self.ready = True
+                except Exception as error:
+                    print(error)
+            waiting = 2
+            print("Waiting {} sec for next response".format(waiting))
+            sleep(waiting)
 

@@ -1,13 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+# future statements like these are kept for backwards compability
+# which I am not sure make much sense since python 3.5 is needed for tensorflow
+#from __future__ import absolute_import, division, print_function, unicode_literals
 
-# TensorFlow and tf.keras
+# TensorFlow and keras
 import tensorflow as tf
 from tensorflow import keras
-
-from tensorflow.keras.models import Sequential, model_from_json
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
 
 # Helper libraries
 import numpy as np
@@ -20,8 +17,8 @@ class Federation:
         self.id = id
         self.model = None
         
-        #self.load_mnist_dataset()
-        #self.instantiate_model()
+        self.load_mnist_dataset()
+        self.instantiate_model()
 
 
     def __str__(self):
@@ -33,6 +30,16 @@ class Federation:
         (self.X_train, self.y_train), (self.X_test, self.y_test) = digits_mnist.load_data()
         self.X_train = self.X_train / 255.0
         self.X_test = self.X_test / 255.0
+
+        self.X_send = self.X_train[:5000]
+        self.y_send = self.y_train[:5000]
+
+        self.send2 = {}
+        self.send2['X_train'] = self.X_send.tolist()
+        self.send2['y_train'] = self.y_send.tolist()
+        #self.send2 = "sd"
+        self.send = [ (X.tolist(), y.tolist()) for X, y in zip(self.X_send, self.y_send) ]
+
 
     def instantiate_model(self):
         self.model = keras.Sequential([
@@ -48,3 +55,14 @@ class Federation:
 
     def get_model_config(self):
         return self.model.to_json()
+
+    def send_data(self):
+        return self.send
+
+if __name__ == '__main__':
+    fed = Federation()
+    print("Type: ", type(fed.X_train), "Shape: ", fed.X_train.shape)
+    #l = fed.X_train.tolist()
+    #print("Type: ", type(l), len(l[0]))
+    print("Send: ", type(fed.send))
+

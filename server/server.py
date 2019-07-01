@@ -14,7 +14,7 @@ class Server:
         subprocess.call('/app/create_federation.sh', shell=True)
         os.chdir('/src/federation')
         #os.system('docker build --rm=false -f "Dockerfile" -t federation:latest .')
-        os.system('docker-compose up' )
+        os.system('docker-compose up -d')
         #client.containers.run('federation_fed-srv')
         print(client.containers.list())
         

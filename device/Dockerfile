@@ -8,3 +8,5 @@ COPY . /app
 
 ENTRYPOINT [ "python" ]
 CMD [ "/app/app.py" ]
+
+# CMD [ "-W", "/app/app.py" ]
