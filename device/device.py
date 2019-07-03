@@ -85,7 +85,6 @@ class Device:
                         self.X_train = np.array(json_data['X_train'])
                         self.y_train = np.array(json_data['y_train'])
                         print(self.X_train.shape, self.y_train.shape)
-                        #print(type(json_data), len(json_data['X_train'][0][0]))
                         self.data_transfered = True
                         self.ready = True
 
@@ -99,15 +98,17 @@ class Device:
                     response = requests.get(self.srv_url + '/ready', params=params)
 
                     if response.status_code == 200:
-                        print("Status: Ready")
-                        global_weights = response.json()
-                        if response.json().get('all_ready'):
-                            print("All is ready")
+                        data = response.json()
+                        if data['weights_update_ready']:
+                            print("Status: setting global weights")
+                            weights = data['weights']
+                            weights = [np.array(w) for w in weights]
+                            self.model.set_weights(weights)
+                            self.ready = False
+                            self.round_trained = False
                         else:
-                            print('Not all is ready')
-                        self.ready = False
-                        self.round_trained = False
-                
+                            print('Status: Reconnecting until other devices are ready')
+                       
                 except Exception as error:
                     print(error)
 
@@ -115,7 +116,7 @@ class Device:
                 self.model.fit(self.X_train, self.y_train, epochs=1)
                 self.round_trained = True
 
-            elif self.round_trained and not self.ready:
+            elif self.round_trained:
                 try:
                     data = {}
                     weights = self.model.get_weights()

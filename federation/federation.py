@@ -74,14 +74,21 @@ class Federation:
     def get_model_config(self):
         return self.model.to_json()
 
-    def get_global_weights(self):
-        weights = self.model.get_weights()
-        weights = [ w.tolist() for w in weights ]
-        return weights
+    def set_random_weights(self):
+        self.global_weights = self.model.get_weights()
 
     def send_data(self):
         return self.send
 
+    def aggregate_function(self):
+        for arr in self.global_weights:
+            print('Arr: ', arr.shape)
+        if all([ device.round_ready for device in self.connected_devices ]):
+            global_weights = [ w * 0 for w  in self.global_weights]
+            for device in self.connected_devices:
+                global_weights = [ w1 + w2 for w1, w2 in zip(global_weights, device.weights) ]
+            self.global_weights = [ w/len(self.connected_devices) for w in global_weights]
+        
 if __name__ == '__main__':
     fed = Federation()
     print("Type: ", type(fed.X_train), "Shape: ", fed.X_train.shape)
