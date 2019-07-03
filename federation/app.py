@@ -37,15 +37,57 @@ def create_federation():
     message = fed.get_model_config()
     return render_template('index.html', message=message)
 
+@app.route("/connect", methods=['GET'])
+def connect_device():
+    return jsonify(fed.connect_device())
+
 @app.route("/config", methods=['GET'])
 def get_config():
-    message = fed.get_model_config()
-    return message
+    return fed.get_model_config()
 
 @app.route("/data", methods=['GET'])
 def get_data():
     return jsonify(fed.send2)
 
+@app.route("/ready", methods=['GET'])
+def device_ready():
+    device_id = request.args.get('id')
+    print("Device ID: {} is ready".format(device_id))
+
+        
+    devices_ready = True
+
+    for device in fed.connected_devices:
+        if device.id == int(device_id):
+            device.ready = True
+        if device.ready == False:
+            devices_ready = False
+        print('Device {} checked {} since {}'.format(device.id, device.ready, device_id))
+
+    data = {}
+    data['all_ready'] = devices_ready
+    if devices_ready and fed.first_round:
+        fed.first_round = False
+        fed.instantiate_model()
+        data['weights'] = fed.get_global_weights()
+    elif devices_ready and not fed.first_round:
+        data['weights'] = fed.global_weights
+
+    return jsonify(data)
+
+@app.route("/round", methods=['POST'])
+def start_round():
+    weights = request.form['weights']
+    print('Weights: ', weights)
+    #weights = [np.array(w) for w in weights]
+    #print('Weights: ', weights)
+    for device in fed.connected_devices:
+        if device.id == int(request.form['id']):
+            device.weights = weights
+            device.round_ready = True
+            device.ready = False
+
+    return jsonify("round started")
 
 @app.route("/tf-test", methods=['GET'])
 def train_tf():

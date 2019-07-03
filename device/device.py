@@ -13,15 +13,19 @@ import numpy as np
 
 class Device:
     def __init__(self, name):
+        self.id = None
         self.name = name
-        self.srv_url = 'http://192.168.42.141:5001'
+        #self.srv_url = 'http://192.168.42.141:5001'
         self.srv_url = 'http://127.0.0.1:5001'
-        self.srv_url = 'http://192.168.1.7:5001'
+        self.srv_url = 'http://192.168.1.2:5001'
         
 
         self.connected = False
         self.initiated = False
         self.data_transfered = False
+        self.round_trained = False
+        self.ready = False
+
 
     def get_model_config(self):
         return self.model.to_json()
@@ -50,12 +54,12 @@ class Device:
 
             if not self.connected:
                 try:
-                    print()
-                    response = requests.get(self.srv_url + '/')
+                    response = requests.get(self.srv_url + '/connect')
 
                     print("Status: ", response.status_code, "Headers: ", response.headers['content-type'])
                     if response.status_code == 200:
                         self.connected = True
+                        self.id = response.json()
 
                 except Exception as error:
                     print(error)    
@@ -80,11 +84,56 @@ class Device:
                         json_data = response.json()
                         self.X_train = np.array(json_data['X_train'])
                         self.y_train = np.array(json_data['y_train'])
+                        print(self.X_train.shape, self.y_train.shape)
                         #print(type(json_data), len(json_data['X_train'][0][0]))
+                        self.data_transfered = True
+                        self.ready = True
 
-                    self.ready = True
                 except Exception as error:
                     print(error)
+
+            elif self.ready:
+                try:
+                    params = {}
+                    params['id'] = self.id
+                    response = requests.get(self.srv_url + '/ready', params=params)
+
+                    if response.status_code == 200:
+                        print("Status: Ready")
+                        global_weights = response.json()
+                        if response.json().get('all_ready'):
+                            print("All is ready")
+                        else:
+                            print('Not all is ready')
+                        self.ready = False
+                        self.round_trained = False
+                
+                except Exception as error:
+                    print(error)
+
+            elif not self.round_trained:
+                self.model.fit(self.X_train, self.y_train, epochs=1)
+                self.round_trained = True
+
+            elif self.round_trained and not self.ready:
+                try:
+                    data = {}
+                    weights = self.model.get_weights()
+
+                    weights = [ w.tolist() for w in weights ]
+
+                    data['weights'] = weights
+                    data['id'] = self.id
+                    response = requests.post(self.srv_url + '/round', data=data)
+
+                    if response.status_code == 200:
+                        print("response: ", response.json())
+                        self.ready = True
+
+                except Exception as error:
+                    print(error)
+
+
             waiting = 2
             print("Waiting {} sec for next response".format(waiting))
             sleep(waiting)
