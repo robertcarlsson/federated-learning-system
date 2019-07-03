@@ -77,12 +77,15 @@ def device_ready():
 
 @app.route("/round", methods=['POST'])
 def start_round():
-    weights = request.form['weights']
-    print('Weights: ', weights)
+    requested_data = request.get_json()
+    weights = requested_data['weights']
+    device_id = requested_data['id']
+    for arr in weights:
+        print('Weights: ', len(arr))
     #weights = [np.array(w) for w in weights]
     #print('Weights: ', weights)
     for device in fed.connected_devices:
-        if device.id == int(request.form['id']):
+        if device.id == device_id:
             device.weights = weights
             device.round_ready = True
             device.ready = False

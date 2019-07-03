@@ -124,7 +124,7 @@ class Device:
 
                     data['weights'] = weights
                     data['id'] = self.id
-                    response = requests.post(self.srv_url + '/round', data=data)
+                    response = requests.post(self.srv_url + '/round', json=data)
 
                     if response.status_code == 200:
                         print("response: ", response.json())
