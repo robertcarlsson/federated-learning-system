@@ -25,6 +25,15 @@ def create_federation():
     message = fed.get_model_config()
     return render_template('index.html', message=message)
 
+@app.route("/start-fed", methods=['GET'])
+def start_fed():
+    fed.set_fed_ready()
+    return jsonify('Status: Federation Server Ready')
+
+@app.route("/fed-ready", methods=['GET'])
+def fed_ready():
+    return jsonify(fed.ready)
+
 @app.route("/connect", methods=['GET'])
 def connect_device():
     return jsonify(fed.connect_device())
@@ -35,7 +44,8 @@ def get_config():
 
 @app.route("/data", methods=['GET'])
 def get_data():
-    return jsonify(fed.send2)
+    data = fed.get_device_data(device_id = request.args.get('id'))
+    return jsonify(data)
 
 @app.route("/ready", methods=['GET'])
 def device_ready():
@@ -48,7 +58,6 @@ def device_ready():
             device.ready = True
         if not device.ready:
             devices_ready = False
-        print('Device id {} checked {} checked id {}'.format(device.id, device.ready, device_id))
 
     data = {}
     data['weights_update_ready'] = devices_ready

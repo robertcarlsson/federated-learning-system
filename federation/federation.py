@@ -18,6 +18,9 @@ class Device:
         self.ready = False
         self.weights = None
 
+        self.X_train = None
+        self.y_train = None
+
 
 class Federation:
     def __init__(self, fed_id=0):
@@ -32,6 +35,7 @@ class Federation:
         self.connected_devices = []
 
         self.first_round = True
+        self.ready = False
 
     def __str__(self):
         return "Federation id: " + str(self.id) + "\nmodel: \n" + self.model.to_json()
@@ -42,6 +46,20 @@ class Federation:
         self.device_id += 1
         return (self.device_id - 1)
 
+    def set_fed_ready(self):
+        self.ready = True
+        # initate the data for the devices
+        n_devices = len(self.connected_devices)
+        points_per_device = 60000 // n_devices
+        points_per_device = 2000
+        n_points = n_devices * points_per_device
+
+        self.X_used = self.X_train[:n_points]
+        self.y_used = self.y_train[:n_points]
+
+        self.X_list = [ X.tolist() for X in np.split(self.X_used, n_devices) ]
+        self.y_list = [ y.tolist() for y in np.split(self.y_used, n_devices) ]
+
     def load_mnist_dataset(self):
         digits_mnist = keras.datasets.mnist
 
@@ -49,14 +67,14 @@ class Federation:
         self.X_train = self.X_train / 255.0
         self.X_test = self.X_test / 255.0
 
-        self.X_send = self.X_train[:5000]
-        self.y_send = self.y_train[:5000]
+        #self.X_send = self.X_train[:5000]
+        #self.y_send = self.y_train[:5000]
 
-        self.send2 = {}
-        self.send2['X_train'] = self.X_send.tolist()
-        self.send2['y_train'] = self.y_send.tolist()
+        #self.send2 = {}
+        #self.send2['X_train'] = self.X_send.tolist()
+        #self.send2['y_train'] = self.y_send.tolist()
         #self.send2 = "sd"
-        self.send = [ (X.tolist(), y.tolist()) for X, y in zip(self.X_send, self.y_send) ]
+        #self.send = [ (X.tolist(), y.tolist()) for X, y in zip(self.X_send, self.y_send) ]
 
 
     def instantiate_model(self):
@@ -77,22 +95,25 @@ class Federation:
     def set_random_weights(self):
         self.global_weights = self.model.get_weights()
 
-    def send_data(self):
-        return self.send
+    def get_device_data(self, device_id):
+        device_id = int(device_id)
+        data = {}
+        data['X_train'] = self.X_list[device_id]
+        data['y_train'] = self.y_list[device_id]
+        return data
 
     def aggregate_function(self):
-        for arr in self.global_weights:
-            print('Arr: ', arr.shape)
         if all([ device.round_ready for device in self.connected_devices ]):
             global_weights = [ w * 0 for w  in self.global_weights]
             for device in self.connected_devices:
                 global_weights = [ w1 + w2 for w1, w2 in zip(global_weights, device.weights) ]
             self.global_weights = [ w/len(self.connected_devices) for w in global_weights]
-        
+    
+    def test_model(self):
+        # Train all the device models and the aggregation
+        pass
+
 if __name__ == '__main__':
     fed = Federation()
     print("Type: ", type(fed.X_train), "Shape: ", fed.X_train.shape)
-    #l = fed.X_train.tolist()
-    #print("Type: ", type(l), len(l[0]))
-    print("Send: ", type(fed.send))
 
