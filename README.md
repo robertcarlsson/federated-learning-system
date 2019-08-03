@@ -22,7 +22,9 @@ cd federated-learning-system/device
 
 sudo docker-compose up
 
+
+
+### 3. Start the learning process
 Now the devices should be up and running and both the federated server and devices are stuck in the connected/ready face, so we need to give the federation a starting signal.
 
-### 3.
 curl http://\*ipadress\*:5001/start-fed
