@@ -1,5 +1,5 @@
 # federated-learning-system
-Federated learning system using docker and tensorflow
+Federated learning system using docker and tensorflow.
 
 
 ## Running
