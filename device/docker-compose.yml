@@ -1,13 +1,27 @@
 version: '3'
 services:
-  device:
-    build: ../device
+  device1:
+    build: .
     restart: always
     deploy:
       replicas: 3
-    depends_on:
-      - fed-srv
+    #depends_on:
+    #  - fed-srv
     volumes:
-      - ./device:/app
+      - .:/app
     #command: ["./wait-for-it.sh", "db:5432", "--", "python", "/app/app.py"]
-    
+  device2:
+    build: .
+    restart: always
+    volumes:
+      - .:/app
+  device3:
+    build: .
+    restart: always
+    volumes:
+      - .:/app
+  device4:
+    build: .
+    restart: always
+    volumes:
+      - .:/app  
