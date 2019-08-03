@@ -12,12 +12,10 @@ from tensorflow.keras.models import model_from_json
 import numpy as np
 
 class Device:
-    def __init__(self, name):
+    def __init__(self, name, server_ip):
         self.id = None
         self.name = name
-        self.srv_url = 'http://192.168.42.141:5001'
-        #self.srv_url = 'http://127.0.0.1:5001'
-        #self.srv_url = 'http://192.168.1.2:5001'
+        self.srv_url = 'http://' + server_ip + ':5001'
 
 
         self.connected = False
