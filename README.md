@@ -2,10 +2,17 @@
 Federated learning system using docker and tensorflow
 
 
-If you have docker-compose installed you can start a running federated learning process by doing these 2 commands.
+## Running
+If you have docker-compose installed you can start a running federated learning process by doing these commands.
+Create two terminal windows and have one of them run as the federation and the other for the devices.
 
-in federated-learning-system/federation
-1. docker-compose up
+### 1.
+cd federated-learning-system/federation
 
-in federated-learning-system/device
-2.docker-compose up
+sudo docker-compose up
+
+### 2.
+
+cd federated-learning-system/device
+
+sudo docker-compose up
