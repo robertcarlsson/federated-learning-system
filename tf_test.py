@@ -1,13 +1,14 @@
+#!/usr/bin/python3
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # TensorFlow and tf.keras
 import tensorflow as tf
 from tensorflow import keras
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import Dense, Dropout
+#from tensorflow.keras.layers import Embedding
+#from tensorflow.keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
 
 
 # Helper libraries
@@ -49,7 +50,7 @@ class Device:
     def train_model_batch(this):
         this.model.train_on_batch(this.X_train, this.y_train)
 
-n_devices = 2
+n_devices = 50
 
 train_images_array = np.split(train_images[:10000], n_devices)
 train_labels_array = np.split(train_labels[:10000], n_devices)
@@ -60,7 +61,7 @@ devices = []
 for i in range(n_devices):
     devices.append(Device(model.to_json(), train_images_array[i], train_labels_array[i]))
 
-n_rounds = 10
+n_rounds = 50
 results = []
 
 for _ in range(n_rounds):
@@ -69,7 +70,8 @@ for _ in range(n_rounds):
     
     for device in devices:
         #device.model.set_weights(global_weights)
-        device.train_model_batch()
+        #device.train_model_batch()
+        device.train_model()
     
     global_weights = [ w * 0 for w  in global_weights]
     
@@ -88,8 +90,8 @@ for _ in range(n_rounds):
     round_results = [ model.evaluate(test_images, test_labels, verbose=0)[1] for model in models]
     results.append(round_results)
 
-    #for device in devices:     
-        #device.model.set_weights(global_weights)
+    for device in devices:     
+        device.model.set_weights(global_weights)
     
 results
 
@@ -99,7 +101,7 @@ plt.axis([0,n_rounds-1, 0.0,1.0,])
 plt.xlabel('Number of rounds')
 plt.ylabel('Accuracy')
 
-plt.title('Federated Average ANN - No global')
+plt.title('Federated Average ANN')
 
 labels = []
 for n in range(n_devices):
