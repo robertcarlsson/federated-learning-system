@@ -15,6 +15,7 @@ from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
+#just testing
 
 digits_mnist = keras.datasets.mnist
 
