@@ -10,7 +10,7 @@ from tensorflow import keras
 #from tensorflow.keras.layers import Embedding
 #from tensorflow.keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
 
-
+# test commit
 # Helper libraries
 import numpy as np
 import matplotlib.pyplot as plt
