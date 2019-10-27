@@ -65,13 +65,45 @@ n_rounds = int(sys.argv[3])
 
 shared_init = True
 
-if (sys.argv[4] == 'not_shared'):
+if (sys.argv[4] == 'not_shared' or 'no'):
     shared_init = False
 
-train_images_array = np.split(train_images[:n_datapoints], n_devices)
-train_labels_array = np.split(train_labels[:n_datapoints], n_devices)
+sorted_indicies = train_labels.argsort()
+
+sorted_train_images = train_images[sorted_indicies]
+sorted_train_labels = train_labels[sorted_indicies]
+
+print("Test run ", sorted_train_labels[0:10])
 
 
+# Now we create each devices local data set
+train_images_array = np.split(sorted_train_images[:n_datapoints], n_devices)
+train_labels_array = np.split(sorted_train_labels[:n_datapoints], n_devices)
+
+numbers = np.arange(10)
+
+print("numbers: ", numbers)
+
+all_zero = np.argwhere(train_labels == 0)
+
+all_numbers_images = []
+all_numbers_labels = []
+
+for number in numbers:
+    indices = np.argwhere(train_labels == number)
+    all_numbers_images.append(train_images[indices])
+    all_numbers_labels.append(train_labels[indices])
+    print("lengths: ", len(all_numbers_images[number-1]))
+
+
+
+print("length of zero list", len(all_zero), all_zero[101])
+
+
+#train_images_array = np.split(train_images[:n_datapoints], n_devices)
+#train_labels_array = np.split(train_labels[:n_datapoints], n_devices)
+
+"""
 devices = []
 
 for i in range(n_devices):
@@ -139,3 +171,5 @@ labels.append('Global Model')
 plt.legend(labels)
 
 plt.show()
+
+"""
