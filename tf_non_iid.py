@@ -80,34 +80,102 @@ print("Test run ", sorted_train_labels[0:10])
 train_images_array = np.split(sorted_train_images[:n_datapoints], n_devices)
 train_labels_array = np.split(sorted_train_labels[:n_datapoints], n_devices)
 
+print("Old style", len(train_images_array), len(train_images_array[0]), len(train_images_array[0][0]) ,len(train_images_array[0][0][0]))
+
 numbers = np.arange(10)
 
-print("numbers: ", numbers)
+#print("numbers: ", numbers)
 
 all_zero = np.argwhere(train_labels == 0)
 
+
+# Something is a miss when creating the images, it gets another layer 
+# 2000, 1, 28, 28 => 2000 images, one image, 28x28 pixels.
+# I need to remove the 1 layer.
 all_numbers_images = []
 all_numbers_labels = []
 
 for number in numbers:
+
     indices = np.argwhere(train_labels == number)
-    all_numbers_images.append(train_images[indices])
-    all_numbers_labels.append(train_labels[indices])
-    print("lengths: ", len(all_numbers_images[number-1]))
+    #print("TEST2", len(train_images[indices][0]))
+    all_numbers_images.append(np.squeeze(train_images[indices]))
+    all_numbers_labels.append(np.squeeze(train_labels[indices]))
+    #print("lengths: ", len(all_numbers_images[number-1]), len(all_numbers_labels[number-1]))
+
+indices = np.argwhere(train_labels == 1)
+test = train_images[indices]
+#print("Indicies:", indices)
+test = np.squeeze(test)
+print("TEST TEST", np.squeeze(test).shape)
+print("Test style:", len(test), len(test[0]), len(test[0][0]))
+
+print("All style", len(all_numbers_images), len(all_numbers_images[0]), len(all_numbers_images[0][0]), len(all_numbers_images[0][0][0]))
+
+devices_chosen_digits = []
+
+digits = np.arange(10)
+
+#print(digits)
+#print(np.delete(digits, 2))
+
+arr = digits
+
+def random_index(length):
+    if length == 0: return 0
+    return np.random.randint(0, length)
+
+#for _ in range(10):
+#    print("random:", random_digit(4))
+
+for device in range(n_devices):
+    devices_chosen_digits.append([])
+
+    #print(arr)
+    index = random_index(len(arr)-1)
+    chosen_digit = arr[index]
+    devices_chosen_digits[device].append(chosen_digit)
+
+    #print(arr, chosen_digit, index)
+    arr = np.delete(arr, index)
+
+    index = random_index(len(arr)-1)
+    chosen_digit = arr[index]
+    devices_chosen_digits[device].append(chosen_digit)
+    arr = np.delete(arr, index)
 
 
+#print("devices", devices_chosen_digits)
 
-print("length of zero list", len(all_zero), all_zero[101])
+train_images_array = []
+train_labels_array = []
 
+index = 0
 
+amount_of_points = 200
+
+for device in devices_chosen_digits:
+    train_images_array.append([])
+    train_labels_array.append([])
+    for digit in device:
+        #print("DIGIT:",digit)
+        train_images_array[index].extend(all_numbers_images[digit][:amount_of_points])
+        train_labels_array[index].extend(all_numbers_labels[digit][:amount_of_points])
+    index += 1
+
+#print("length of zero list", len(all_zero), all_zero[101])
+
+#print("LENGTH", len(train_images_array[0]))
 #train_images_array = np.split(train_images[:n_datapoints], n_devices)
 #train_labels_array = np.split(train_labels[:n_datapoints], n_devices)
 
-"""
+print("New styles", len(train_images_array),len(train_images_array[0]), len(train_images_array[0][0]), len(train_images_array[0][0][0]))
+#print(train_images_array[0])
+
 devices = []
 
 for i in range(n_devices):
-    devices.append(Device(model.to_json(), train_images_array[i], train_labels_array[i]))
+    devices.append(Device(model.to_json(), np.array(train_images_array[i]), np.array(train_labels_array[i])))
 
 results = []
 
@@ -147,8 +215,6 @@ for _ in range(n_rounds):
     for device in devices:     
         device.model.set_weights(global_weights)
     
-results
-
 plt.plot(results)
 plt.axis([0,n_rounds-1, 0.0,1.0,])
 
@@ -160,7 +226,7 @@ extra = 'Shared initialization'
 if not shared_init:
     extra = 'Individual initialization'
 
-plt.title('Federated Average ANN - ' + extra)
+plt.title('Federated Average ANN - Non-IID')
 
 labels = []
 for n in range(n_devices):
@@ -171,5 +237,3 @@ labels.append('Global Model')
 plt.legend(labels)
 
 plt.show()
-
-"""
