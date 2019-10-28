@@ -21,8 +21,8 @@ print ("Number of arguments: ", len(sys.argv))
 print ("The arguments are: " , str(sys.argv))
 
 if (len(sys.argv) < 5):
-    print ("This file needs these arguments:")
-    print ("python tf_test.py n_datapoints n_device n_rounds shared_init")
+    print ("This file needs these arguments:\n")
+    print ("n_datapoints \t\tNumber of datapoints \nn_device \t\tNumber of devices \nn_rounds \t\tNumber of rounds \nshared_init \t\tInitialization option, \"no\" or \"yes\" \n")
     exit()
 
 digits_mnist = keras.datasets.mnist
@@ -152,7 +152,7 @@ train_labels_array = []
 
 index = 0
 
-amount_of_points = 200
+amount_of_points = 1000
 
 for device in devices_chosen_digits:
     train_images_array.append([])
