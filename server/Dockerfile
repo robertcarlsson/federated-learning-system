@@ -3,7 +3,7 @@ FROM python:3.5-alpine
 RUN apk add docker
 
 RUN apk add \
-    python-dev \
+    python3-dev \
     libffi-dev \
     openssl-dev \
     gcc \
@@ -19,5 +19,5 @@ WORKDIR /app
 COPY . /app
 
 EXPOSE 5000
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 CMD [ "/app/app.py" ]
