@@ -9,7 +9,7 @@ from tensorflow import keras
 # Helper libraries
 import numpy as np
 
-graph = tf.get_default_graph()
+graph = tf.compat.v1.get_default_graph()
 
 class Device:
     def __init__(self, device_id):

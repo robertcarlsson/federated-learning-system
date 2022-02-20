@@ -13,5 +13,5 @@ ENV FLASK_APP /app/app.py
 EXPOSE 5000
 
 #ENTRYPOINT [ "sh" ]
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 CMD [ "/app/app.py" ]
